@@ -1,0 +1,526 @@
+{
+  "$defs": {
+    "Arc": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Unique edge ID in traversal order: e1, e2, ... .",
+          "pattern": "^e[0-9]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "const": "arc",
+          "title": "Type",
+          "type": "string"
+        },
+        "from": {
+          "description": "Existing vertex ID: start of this edge in chain order; must equal the preceding edge endpoint when present.",
+          "pattern": "^p[0-9]+$",
+          "title": "From",
+          "type": "string"
+        },
+        "to": {
+          "description": "Existing vertex ID: the next vertex in chain order, distinct from from; must equal the next edge start when present.",
+          "pattern": "^p[0-9]+$",
+          "title": "To",
+          "type": "string"
+        },
+        "radius": {
+          "anyOf": [
+            {
+              "description": "Strictly positive nominal value in mm; never zero.",
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Radius"
+        },
+        "clockwise": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Clockwise"
+        },
+        "shape": {
+          "anyOf": [
+            {
+              "enum": [
+                "in",
+                "out"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Direction of the convex side of the arc relative to the part material: in points into the part; out points outward. Not the center location or traversal direction. Null requires an unresolved entry targeting this arc ID with the reason.",
+          "title": "Shape"
+        },
+        "arc_size": {
+          "anyOf": [
+            {
+              "enum": [
+                "minor",
+                "semicircle",
+                "major"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Classify the drawn arc from from to to: minor has a sweep below 180 degrees, semicircle exactly 180 degrees, major above 180 and below 360 degrees. Independent of shape and clockwise. Do not calculate an exact angle or assume minor. Null requires an unresolved entry targeting this arc ID with the reason.",
+          "title": "Arc Size"
+        },
+        "center_constraint": {
+          "description": "none means no extra center constraint; it does NOT mean the center is off-axis.",
+          "enum": [
+            "on_symmetry_axis",
+            "none",
+            "unknown"
+          ],
+          "title": "Center Constraint",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/Source"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "from",
+        "to",
+        "radius",
+        "clockwise",
+        "shape",
+        "arc_size",
+        "center_constraint",
+        "source"
+      ],
+      "title": "Arc",
+      "type": "object"
+    },
+    "Diameter": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^d[0-9]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "const": "diameter",
+          "title": "Type",
+          "type": "string"
+        },
+        "vertex": {
+          "description": "Existing vertex ID on the surface to which the stated diameter belongs.",
+          "pattern": "^p[0-9]+$",
+          "title": "Vertex",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "description": "Strictly positive nominal value in mm; never zero.",
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "source": {
+          "$ref": "#/$defs/Source"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "vertex",
+        "value",
+        "source"
+      ],
+      "title": "Diameter",
+      "type": "object"
+    },
+    "Distance": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^d[0-9]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "const": "distance",
+          "title": "Type",
+          "type": "string"
+        },
+        "from": {
+          "description": "Existing vertex ID at the lower coordinate on the measurement axis; distinct from to. Need not precede to in contour traversal order.",
+          "pattern": "^p[0-9]+$",
+          "title": "From",
+          "type": "string"
+        },
+        "to": {
+          "description": "Existing vertex ID at the higher coordinate on the measurement axis; distinct from from. Endpoints need not be adjacent.",
+          "pattern": "^p[0-9]+$",
+          "title": "To",
+          "type": "string"
+        },
+        "axis": {
+          "description": "Signed projection: to[axis] - from[axis] = positive value; not Euclidean distance.",
+          "enum": [
+            "X",
+            "Y"
+          ],
+          "title": "Axis",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "description": "Strictly positive nominal value in mm; never zero.",
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "source": {
+          "$ref": "#/$defs/Source"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "from",
+        "to",
+        "axis",
+        "value",
+        "source"
+      ],
+      "title": "Distance",
+      "type": "object"
+    },
+    "ExtractionFailure": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "status": {
+          "const": "error",
+          "title": "Status",
+          "type": "string"
+        },
+        "message": {
+          "description": "Plain-text English explanation for the user: why contour extraction failed and, if known, what to change. No technical details, Markdown or HTML.",
+          "maxLength": 1000,
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "status",
+        "message"
+      ],
+      "title": "ExtractionFailure",
+      "type": "object"
+    },
+    "ExtractionResult": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "units": {
+          "const": "mm",
+          "title": "Units",
+          "type": "string"
+        },
+        "profile": {
+          "$ref": "#/$defs/Profile"
+        },
+        "vertices": {
+          "description": "Every chain vertex exactly once in traversal order, with unique IDs p0, p1, ... . No unused vertices. First vertex is the origin (0, 0); last vertex has x = null and y = 0.",
+          "items": {
+            "$ref": "#/$defs/Vertex"
+          },
+          "minItems": 2,
+          "title": "Vertices",
+          "type": "array"
+        },
+        "edges": {
+          "description": "Exactly one fewer edge than vertices. Unique IDs e1, e2, ... in traversal order: e1 connects p0 to p1, e2 connects p1 to p2, etc. Each to equals the next from. No self-loops, revisited vertices, branches, gaps or closing edge.",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Line"
+              },
+              {
+                "$ref": "#/$defs/Arc"
+              }
+            ]
+          },
+          "minItems": 1,
+          "title": "Edges",
+          "type": "array"
+        },
+        "dimensions": {
+          "description": "Unique IDs d1, d2, ... . All vertex references must exist in vertices. Record each stated dimension once.",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Distance"
+              },
+              {
+                "$ref": "#/$defs/Diameter"
+              }
+            ]
+          },
+          "title": "Dimensions",
+          "type": "array"
+        },
+        "unresolved": {
+          "items": {
+            "$ref": "#/$defs/UnresolvedIssue"
+          },
+          "title": "Unresolved",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "units",
+        "profile",
+        "vertices",
+        "edges",
+        "dimensions",
+        "unresolved"
+      ],
+      "title": "ExtractionResult",
+      "type": "object"
+    },
+    "Line": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Unique edge ID in traversal order: e1, e2, ... .",
+          "pattern": "^e[0-9]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "const": "line",
+          "title": "Type",
+          "type": "string"
+        },
+        "from": {
+          "description": "Existing vertex ID: start of this edge in chain order; must equal the preceding edge endpoint when present.",
+          "pattern": "^p[0-9]+$",
+          "title": "From",
+          "type": "string"
+        },
+        "to": {
+          "description": "Existing vertex ID: the next vertex in chain order, distinct from from; must equal the next edge start when present.",
+          "pattern": "^p[0-9]+$",
+          "title": "To",
+          "type": "string"
+        },
+        "direction": {
+          "anyOf": [
+            {
+              "enum": [
+                "+X",
+                "-X",
+                "+Y",
+                "-Y"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Direction"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "from",
+        "to",
+        "direction"
+      ],
+      "title": "Line",
+      "type": "object"
+    },
+    "Profile": {
+      "additionalProperties": false,
+      "properties": {
+        "view": {
+          "minLength": 1,
+          "title": "View",
+          "type": "string"
+        },
+        "half": {
+          "const": "upper",
+          "title": "Half",
+          "type": "string"
+        },
+        "symmetry_axis": {
+          "const": "X",
+          "title": "Symmetry Axis",
+          "type": "string"
+        },
+        "origin_vertex": {
+          "description": "Must be p0: the first listed vertex and start of the first edge, with x = 0 and y = 0.",
+          "pattern": "^p[0-9]+$",
+          "title": "Origin Vertex",
+          "type": "string"
+        }
+      },
+      "required": [
+        "view",
+        "half",
+        "symmetry_axis",
+        "origin_vertex"
+      ],
+      "title": "Profile",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "view": {
+          "minLength": 1,
+          "title": "View",
+          "type": "string"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Dimension label from the drawing; decimal punctuation may be normalized. Null requires an unresolved issue.",
+          "title": "Text"
+        }
+      },
+      "required": [
+        "view",
+        "text"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "UnresolvedIssue": {
+      "additionalProperties": false,
+      "properties": {
+        "target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "An ID of a vertex, edge or dimension actually present in this response. Use null for a global issue or unassigned annotation, including references to omitted objects.",
+          "title": "Target"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "target",
+        "reason"
+      ],
+      "title": "UnresolvedIssue",
+      "type": "object"
+    },
+    "Vertex": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^p[0-9]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "x": {
+          "anyOf": [
+            {
+              "const": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "X"
+        },
+        "y": {
+          "anyOf": [
+            {
+              "const": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Y"
+        }
+      },
+      "required": [
+        "id",
+        "x",
+        "y"
+      ],
+      "title": "Vertex",
+      "type": "object"
+    }
+  },
+  "anyOf": [
+    {
+      "$ref": "#/$defs/ExtractionResult"
+    },
+    {
+      "$ref": "#/$defs/ExtractionFailure"
+    }
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Generated from app.models.extraction; do not edit manually."
+}

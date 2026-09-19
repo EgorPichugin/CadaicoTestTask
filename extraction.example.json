@@ -1,0 +1,222 @@
+{
+  "schema_version": "2.0",
+  "units": "mm",
+  "profile": {
+    "view": "section_A_A",
+    "half": "upper",
+    "symmetry_axis": "X",
+    "origin_vertex": "p0"
+  },
+  "vertices": [
+    {
+      "id": "p0",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "p1",
+      "x": null,
+      "y": null
+    },
+    {
+      "id": "p2",
+      "x": null,
+      "y": null
+    },
+    {
+      "id": "p3",
+      "x": null,
+      "y": null
+    },
+    {
+      "id": "p4",
+      "x": null,
+      "y": null
+    },
+    {
+      "id": "p5",
+      "x": null,
+      "y": null
+    },
+    {
+      "id": "p6",
+      "x": null,
+      "y": null
+    },
+    {
+      "id": "p7",
+      "x": null,
+      "y": null
+    },
+    {
+      "id": "p8",
+      "x": null,
+      "y": 0
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "type": "arc",
+      "from": "p0",
+      "to": "p1",
+      "radius": 40.5,
+      "clockwise": true,
+      "shape": "out",
+      "arc_size": "minor",
+      "center_constraint": "on_symmetry_axis",
+      "source": {
+        "view": "section_A_A",
+        "text": "R40.5"
+      }
+    },
+    {
+      "id": "e2",
+      "type": "line",
+      "from": "p1",
+      "to": "p2",
+      "direction": "+X"
+    },
+    {
+      "id": "e3",
+      "type": "arc",
+      "from": "p2",
+      "to": "p3",
+      "radius": 9,
+      "clockwise": false,
+      "shape": "in",
+      "arc_size": "minor",
+      "center_constraint": "none",
+      "source": {
+        "view": "section_A_A",
+        "text": "R9"
+      }
+    },
+    {
+      "id": "e4",
+      "type": "line",
+      "from": "p3",
+      "to": "p4",
+      "direction": "+Y"
+    },
+    {
+      "id": "e5",
+      "type": "line",
+      "from": "p4",
+      "to": "p5",
+      "direction": "+X"
+    },
+    {
+      "id": "e6",
+      "type": "line",
+      "from": "p5",
+      "to": "p6",
+      "direction": "-Y"
+    },
+    {
+      "id": "e7",
+      "type": "line",
+      "from": "p6",
+      "to": "p7",
+      "direction": "+X"
+    },
+    {
+      "id": "e8",
+      "type": "line",
+      "from": "p7",
+      "to": "p8",
+      "direction": "-Y"
+    }
+  ],
+  "dimensions": [
+    {
+      "id": "d1",
+      "type": "distance",
+      "from": "p0",
+      "to": "p8",
+      "axis": "X",
+      "value": 31,
+      "source": {
+        "view": "section_A_A",
+        "text": "31"
+      }
+    },
+    {
+      "id": "d2",
+      "type": "distance",
+      "from": "p2",
+      "to": "p8",
+      "axis": "X",
+      "value": 26,
+      "source": {
+        "view": "section_A_A",
+        "text": "26"
+      }
+    },
+    {
+      "id": "d3",
+      "type": "distance",
+      "from": "p3",
+      "to": "p8",
+      "axis": "X",
+      "value": 18.5,
+      "source": {
+        "view": "section_A_A",
+        "text": "18.5"
+      }
+    },
+    {
+      "id": "d4",
+      "type": "distance",
+      "from": "p5",
+      "to": "p8",
+      "axis": "X",
+      "value": 6,
+      "source": {
+        "view": "section_A_A",
+        "text": "6"
+      }
+    },
+    {
+      "id": "d5",
+      "type": "diameter",
+      "vertex": "p1",
+      "value": 20,
+      "source": {
+        "view": "front",
+        "text": "Ø20 h7"
+      }
+    },
+    {
+      "id": "d6",
+      "type": "diameter",
+      "vertex": "p3",
+      "value": 12,
+      "source": {
+        "view": "section_A_A",
+        "text": "Ø12"
+      }
+    },
+    {
+      "id": "d7",
+      "type": "diameter",
+      "vertex": "p4",
+      "value": 15,
+      "source": {
+        "view": "front",
+        "text": "Ø15 ±0.01"
+      }
+    },
+    {
+      "id": "d8",
+      "type": "diameter",
+      "vertex": "p6",
+      "value": 9,
+      "source": {
+        "view": "front",
+        "text": "Ø9 +0.02/-0.01"
+      }
+    }
+  ],
+  "unresolved": []
+}

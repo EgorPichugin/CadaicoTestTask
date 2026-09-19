@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cadaico-backend"
+version = "0.1.0"
+description = "AI-assisted extraction of reproducible CAD contours from technical drawings"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "openai>=2.32,<3.0",
+    "fastapi>=0.115,<1.0",
+    "python-multipart>=0.0.9,<1.0",
+    "python-dotenv>=1.0,<2.0",
+    "uvicorn[standard]>=0.30,<1.0",
+    "sympy>=1.13,<2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx>=0.27,<1.0",
+    "pytest>=8.0,<9.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.setuptools.package-data]
+"app.resources" = ["*.json", "*.md"]

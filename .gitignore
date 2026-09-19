@@ -1,0 +1,35 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python environments, caches and build output
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+pytest-cache-files-*/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# Local editor and operating system files
+.idea/
+.vscode/
+Thumbs.db
+Desktop.ini
+
+# Local extraction experiments
+manual_testing/
+result.json
+app/extract_contour.py
+tests/test_extract_contour.py
+tests/test_manual_testing.py
+tests/test_run_pipeline.py
