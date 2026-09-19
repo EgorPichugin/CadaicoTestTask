@@ -63,6 +63,19 @@ def test_health() -> None:
     assert response.json() == {"status": "ok"}
 
 
+def test_browser_preflight_is_allowed() -> None:
+    response = client.options(
+        "/api/v1/extractions",
+        headers={
+            "Origin": "https://example.com",
+            "Access-Control-Request-Method": "POST",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "*"
+
+
 def test_pipeline_returns_unresolved_geometry() -> None:
     app.dependency_overrides[get_drawing_analysis_client] = MockDrawingAnalysisClient
     try:

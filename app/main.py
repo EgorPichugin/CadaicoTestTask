@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.contour_extraction import router as contour_extraction_router
 from app.api.error_handlers import (
@@ -13,6 +14,13 @@ app = FastAPI(
     title="CADAICO CAD Builder API",
     description="A minimal FastAPI application.",
     version="0.1.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
 )
 
 app.include_router(contour_extraction_router, prefix="/api/v1")
