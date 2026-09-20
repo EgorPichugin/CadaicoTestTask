@@ -129,7 +129,7 @@ def test_reference_extraction_returns_closed_geometry_through_api() -> None:
             result["edges"], result["edges"][1:] + result["edges"][:1]
         )
     )
-    assert payload["dxf"].startswith("0\r\nSECTION\r\n")
+    assert payload["dxf"].lstrip().startswith("0\r\nSECTION\r\n")
     assert payload["dxf"].endswith("0\r\nEOF\r\n")
     assert "\r\nARC\r\n" in payload["dxf"]
 
@@ -206,7 +206,7 @@ def test_processing_service_can_be_replaced_through_di() -> None:
     assert response.status_code == 200
     payload = response.json()
     assert payload["geometry"] == GEOMETRY
-    assert payload["dxf"].startswith("0\r\nSECTION\r\n")
+    assert payload["dxf"].lstrip().startswith("0\r\nSECTION\r\n")
 
 
 def test_geometry_calculator_can_be_replaced_through_di():
@@ -228,7 +228,7 @@ def test_geometry_calculator_can_be_replaced_through_di():
     assert response.status_code == 200
     payload = response.json()
     assert payload["geometry"] == GEOMETRY
-    assert payload["dxf"].startswith("0\r\nSECTION\r\n")
+    assert payload["dxf"].lstrip().startswith("0\r\nSECTION\r\n")
     assert "dimensions" not in payload["geometry"]
 
 

@@ -1,5 +1,7 @@
 from copy import deepcopy
+from io import StringIO
 
+import ezdxf
 import pytest
 
 from app.models.geometry import GeometryResult
@@ -51,10 +53,32 @@ def pairs(text: str) -> list[tuple[int, str]]:
 
 
 def arc_angles(text: str) -> tuple[float, float]:
+    arc = ezdxf.read(StringIO(text, newline=None)).modelspace().query("ARC")[0]
+    return arc.dxf.start_angle, arc.dxf.end_angle
+
+
+def test_export_has_complete_modelspace_structure_without_reader_repairs() -> None:
+    text = DxfExportService().export(GeometryResult.model_validate(GEOMETRY))
     values = pairs(text)
-    start = next(float(value) for code, value in values if code == 50)
-    end = next(float(value) for code, value in values if code == 51)
-    return start, end
+    # Inspect raw output too: permissive readers can recreate missing sections.
+    for section in ("TABLES", "BLOCKS", "OBJECTS"):
+        assert (2, section) in values
+    assert (2, "*Model_Space") in values
+
+    document = ezdxf.read(StringIO(text, newline=None))
+    modelspace = document.modelspace()
+    owner = modelspace.block_record_handle
+    assert len(modelspace) == 2
+    assert document.units == 4
+    for entity in modelspace:
+        assert entity.dxf.owner == owner
+        handle_index = values.index((5, entity.dxf.handle))
+        assert values[handle_index + 1] == (330, owner)
+    assert tuple(modelspace.query("LINE")[0].dxf.start) == (0, 1, 0)
+    assert tuple(modelspace.query("LINE")[0].dxf.end) == (1, 0, 0)
+    audit = document.audit()
+    assert not audit.errors
+    assert not audit.fixes
 
 
 def test_dxf_uses_mm_and_native_line_and_arc_entities() -> None:
