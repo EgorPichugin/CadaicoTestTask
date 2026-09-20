@@ -11,6 +11,7 @@ from app.contracts.contour_extraction import (
 )
 from app.services.contour_extraction import ContourExtractionService
 from app.services.drawing_processing import DrawingProcessingService
+from app.services.dxf_export import DxfExportService
 from app.services.image_validation import DrawingImageValidator
 from app.services.geometry_calculation import GeometryCalculationService
 
@@ -45,6 +46,10 @@ def get_drawing_image_validator() -> DrawingImageValidator:
 
 def get_geometry_calculation_service() -> GeometryCalculationService:
     return GeometryCalculationService()
+
+
+def get_dxf_export_service() -> DxfExportService:
+    return DxfExportService()
 
 
 def get_drawing_processing_service(

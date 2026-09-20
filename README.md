@@ -111,9 +111,11 @@ Documentation: [model](https://developers.openai.com/api/docs/models/gpt-6-astra
 The `DrawingProcessingService` pipeline is `DrawingImageValidator` →
 `ContourExtractionService` → `GeometryCalculationService`. Each stage is connected
 through dependency injection. Extraction returns an `ExtractionResult`, which is
-passed to `calculate(extraction)`. The output is a `GeometryResult` containing
-`units`, `profile`, `status`, `is_closed`, `issues`, `vertices` and `edges`, without
-the original dimensions. The input `ExtractionResult` is not modified.
+passed to `calculate(extraction)`. The API output contains `geometry` with a
+`GeometryResult` and `dxf` with the ready-to-download CAD file content.
+`GeometryResult` contains `units`, `profile`, `status`, `is_closed`, `issues`,
+`vertices` and `edges`, without the original dimensions. The input
+`ExtractionResult` is not modified.
 
 The API returns HTTP 200 when geometry calculation completes, including when the
 constraints cannot be solved. Clients must check `status`:
@@ -125,11 +127,13 @@ constraints cannot be solved. Clients must check `status`:
 | `Ambiguous` | More than one valid geometry remains. |
 | `Invalid` | The input is invalid or the constraints contradict each other. |
 
-Only `Success` includes calculated vertices and edges, with `is_closed = true`.
-Other statuses return empty geometry lists, `is_closed = false`, and explanations
-in `issues`; each issue contains a `target` ID (or `null` for a global issue) and
-a `reason`. Image validation and extraction failures retain their HTTP error
-responses described above.
+Only `Success` includes calculated vertices and edges, with `is_closed = true`,
+and a non-null DXF string. The DXF contains native `LINE` and `ARC` entities in
+millimetres. Frontend clients download this value directly instead of
+recalculating CAD entities. Other statuses return `dxf = null`, empty geometry
+lists, `is_closed = false`, and explanations in `issues`; each issue contains a
+`target` ID (or `null` for a global issue) and a `reason`. Image validation and
+extraction failures retain their HTTP error responses described above.
 
 The successful result contains the upper profile followed by its reflection
 about the X axis, traversed back to the origin. Points on the axis are shared.

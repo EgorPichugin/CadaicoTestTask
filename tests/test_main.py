@@ -87,7 +87,9 @@ def test_pipeline_returns_unresolved_geometry() -> None:
         app.dependency_overrides.pop(get_drawing_analysis_client, None)
 
     assert response.status_code == 200
-    result = response.json()
+    payload = response.json()
+    result = payload["geometry"]
+    assert payload["dxf"] is None
     assert result["status"] == "Unresolved"
     assert result["is_closed"] is False
     assert result["vertices"] == []
@@ -113,7 +115,8 @@ def test_reference_extraction_returns_closed_geometry_through_api() -> None:
         app.dependency_overrides.pop(get_drawing_analysis_client, None)
 
     assert response.status_code == 200
-    result = response.json()
+    payload = response.json()
+    result = payload["geometry"]
     assert result["status"] == "Success", result["issues"]
     assert result["is_closed"] is True
     assert result["issues"] == []
@@ -126,6 +129,9 @@ def test_reference_extraction_returns_closed_geometry_through_api() -> None:
             result["edges"], result["edges"][1:] + result["edges"][:1]
         )
     )
+    assert payload["dxf"].startswith("0\r\nSECTION\r\n")
+    assert payload["dxf"].endswith("0\r\nEOF\r\n")
+    assert "\r\nARC\r\n" in payload["dxf"]
 
 
 def test_missing_openai_key_returns_user_message(monkeypatch) -> None:
@@ -198,7 +204,9 @@ def test_processing_service_can_be_replaced_through_di() -> None:
         app.dependency_overrides.clear()
 
     assert response.status_code == 200
-    assert response.json() == GEOMETRY
+    payload = response.json()
+    assert payload["geometry"] == GEOMETRY
+    assert payload["dxf"].startswith("0\r\nSECTION\r\n")
 
 
 def test_geometry_calculator_can_be_replaced_through_di():
@@ -218,8 +226,10 @@ def test_geometry_calculator_can_be_replaced_through_di():
         app.dependency_overrides.pop(get_drawing_analysis_client, None)
         app.dependency_overrides.pop(get_geometry_calculation_service, None)
     assert response.status_code == 200
-    assert response.json() == GEOMETRY
-    assert "dimensions" not in response.json()
+    payload = response.json()
+    assert payload["geometry"] == GEOMETRY
+    assert payload["dxf"].startswith("0\r\nSECTION\r\n")
+    assert "dimensions" not in payload["geometry"]
 
 
 @pytest.mark.parametrize("status", ["Unresolved", "Ambiguous", "Invalid"])
@@ -247,7 +257,9 @@ def test_unsuccessful_geometry_is_returned_with_status_and_issue(status):
         app.dependency_overrides.pop(get_geometry_calculation_service, None)
 
     assert response.status_code == 200
-    result = response.json()
+    payload = response.json()
+    result = payload["geometry"]
+    assert payload["dxf"] is None
     assert result["status"] == status
     assert result["issues"] == [issue]
     assert result["vertices"] == []
