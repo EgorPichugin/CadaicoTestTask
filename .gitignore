@@ -29,6 +29,7 @@ Desktop.ini
 # Local extraction experiments
 manual_testing/
 result.json
+*_result/
 app/extract_contour.py
 tests/test_extract_contour.py
 tests/test_manual_testing.py

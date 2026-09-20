@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Protocol
 
 from app.models.drawing import DrawingImage
@@ -17,6 +18,12 @@ class GeometryCalculator(Protocol):
     def calculate(self, extraction: ExtractionResult) -> GeometryResult: ...
 
 
+@dataclass(frozen=True, slots=True)
+class DrawingProcessingResult:
+    extraction: ExtractionResult
+    geometry: GeometryResult
+
+
 class DrawingProcessingService:
     """Coordinate image validation, extraction and geometry calculation."""
 
@@ -31,6 +38,12 @@ class DrawingProcessingService:
         self._geometry_calculator = geometry_calculator
 
     async def process(self, drawing: DrawingImage) -> GeometryResult:
+        return (await self.process_with_extraction(drawing)).geometry
+
+    async def process_with_extraction(
+        self, drawing: DrawingImage
+    ) -> DrawingProcessingResult:
         self._image_validator.validate(drawing)
         extraction = await self._contour_extractor.extract(drawing)
-        return self._geometry_calculator.calculate(extraction)
+        geometry = self._geometry_calculator.calculate(extraction)
+        return DrawingProcessingResult(extraction=extraction, geometry=geometry)

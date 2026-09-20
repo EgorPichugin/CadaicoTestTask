@@ -2,6 +2,57 @@
 
 FastAPI service for extracting and calculating reproducible CAD contours from technical drawings.
 
+## Process a drawing locally
+
+The complete pipeline can run from PowerShell without starting FastAPI. It
+validates the image, sends it to the configured LLM, calculates the closed
+contour and exports the result as JSON and DXF.
+
+```powershell
+py -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+Copy-Item .env.example .env
+```
+
+Add your OpenAI API key to `.env`, then run:
+
+```powershell
+python -m app.cli.process_drawing
+```
+
+A standard Windows file picker opens. Select a JPG, PNG or WebP drawing. For
+scripts and automated runs, the image path can still be passed directly:
+
+```powershell
+python -m app.cli.process_drawing "C:\path\to\drawing.jpg"
+```
+
+By default, a new `drawing_result` directory is created next to the image:
+
+```text
+drawing_result/
+├── extraction_result.json
+├── geometry_result.json
+└── contour.dxf
+```
+
+Use `--output` to select a different directory:
+
+```powershell
+python -m app.cli.process_drawing drawing.jpg --output results\drawing-01
+```
+
+The output directory must not already exist, so a previous run is never
+overwritten. `contour.dxf` is created only when geometry status is `Success`.
+For `Unresolved`, `Ambiguous` or `Invalid`, both JSON files are saved with the
+available evidence and issues, and the command exits with code `2`. Input,
+configuration or extraction errors exit with code `1` without publishing a
+partial result directory.
+
+This command does not start an HTTP server, but image recognition still uses the
+OpenAI API and therefore requires `OPENAI_API_KEY` and an internet connection.
+
 ## Run in Windows PowerShell
 
 ```powershell
